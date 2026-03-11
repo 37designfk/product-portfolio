@@ -20,7 +20,7 @@ const { product, index } = Astro.props;
   <div class={`relative h-48 bg-gradient-to-br ${product.gradient} overflow-hidden`}>
     {product.screenshot ? (
       <img
-        src={product.screenshot}
+        src={`${import.meta.env.BASE_URL}${product.screenshot?.replace(/^\//, '')}`}
         alt={`${product.name} スクリーンショット`}
         class="w-full h-full object-cover object-top"
         loading="lazy"
