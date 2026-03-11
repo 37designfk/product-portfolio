@@ -1,0 +1,61 @@
+---
+import { products, categories } from '../data/products';
+import ProductCard from './ProductCard.astro';
+---
+
+<section id="products" class="py-20 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+    <!-- Filter tabs -->
+    <div class="flex flex-wrap justify-center gap-2 mb-12" id="filter-tabs">
+      {categories.map((cat) => (
+        <button
+          class="filter-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border"
+          data-filter={cat.id}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="product-grid">
+      {products.map((product, i) => (
+        <ProductCard product={product} index={i} />
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  const buttons = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('#product-grid article');
+
+  function setFilter(filter: string) {
+    buttons.forEach(btn => {
+      const isActive = btn.getAttribute('data-filter') === filter;
+      btn.classList.toggle('bg-accent', isActive);
+      btn.classList.toggle('text-white', isActive);
+      btn.classList.toggle('border-accent', isActive);
+      btn.classList.toggle('bg-transparent', !isActive);
+      btn.classList.toggle('text-text-muted', !isActive);
+      btn.classList.toggle('border-white/10', !isActive);
+      btn.classList.toggle('hover:border-white/20', !isActive);
+      btn.classList.toggle('hover:text-white', !isActive);
+    });
+
+    cards.forEach(card => {
+      const category = card.getAttribute('data-category');
+      const show = filter === 'all' || category === filter;
+      (card as HTMLElement).style.display = show ? '' : 'none';
+    });
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      setFilter(btn.getAttribute('data-filter') || 'all');
+    });
+  });
+
+  // Default: show all
+  setFilter('all');
+</script>

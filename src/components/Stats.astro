@@ -1,0 +1,24 @@
+---
+const stats = [
+  { label: 'AI搭載プロダクト', value: '8', suffix: '個' },
+  { label: '稼働中サービス', value: '5', suffix: '本' },
+  { label: '使用技術スタック', value: '15', suffix: '+' },
+  { label: 'モバイルアプリ', value: '1', suffix: '本' },
+];
+---
+
+<section id="stats" class="py-20 px-4 sm:px-6 lg:px-8 border-t border-white/5">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12">開発実績</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      {stats.map((stat) => (
+        <div class="text-center p-6 rounded-2xl bg-surface border border-white/5">
+          <div class="text-3xl sm:text-4xl font-black text-white mb-1">
+            {stat.value}<span class="text-accent-light text-lg">{stat.suffix}</span>
+          </div>
+          <div class="text-sm text-text-muted">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
