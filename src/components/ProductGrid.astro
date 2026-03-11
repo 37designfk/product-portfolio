@@ -38,9 +38,9 @@ import ProductCard from './ProductCard.astro';
       btn.classList.toggle('border-accent', isActive);
       btn.classList.toggle('bg-transparent', !isActive);
       btn.classList.toggle('text-text-muted', !isActive);
-      btn.classList.toggle('border-white/10', !isActive);
-      btn.classList.toggle('hover:border-white/20', !isActive);
-      btn.classList.toggle('hover:text-white', !isActive);
+      btn.classList.toggle('border-border', !isActive);
+      btn.classList.toggle('hover:border-accent/30', !isActive);
+      btn.classList.toggle('hover:text-text', !isActive);
     });
 
     cards.forEach(card => {

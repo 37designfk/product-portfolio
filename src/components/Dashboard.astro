@@ -1,0 +1,311 @@
+---
+import { allProducts } from '../data/products';
+---
+
+<!-- Dashboard toggle button (hidden until authenticated) -->
+<button
+  id="dashboard-toggle"
+  class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-accent text-white shadow-lg shadow-accent/30 flex items-center justify-center hover:bg-accent-light transition-colors hidden"
+  aria-label="ダッシュボード"
+>
+  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+  </svg>
+</button>
+
+<!-- Password modal -->
+<div id="password-modal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-black/40 backdrop-blur-sm">
+  <div class="bg-white border border-border rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl">
+    <h3 class="text-lg font-bold text-text mb-1">管理者認証</h3>
+    <p class="text-sm text-text-muted mb-4">ダッシュボードにアクセスするにはパスワードを入力してください。</p>
+    <form id="password-form" class="space-y-4">
+      <div>
+        <input
+          id="admin-password"
+          type="password"
+          placeholder="パスワード"
+          autocomplete="off"
+          class="w-full px-4 py-2.5 rounded-lg bg-surface border border-border text-text placeholder-text-muted focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent text-sm"
+        />
+        <p id="password-error" class="text-red-500 text-xs mt-1.5 hidden">パスワードが違います</p>
+      </div>
+      <div class="flex gap-2">
+        <button type="submit" class="flex-1 px-4 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent-light transition-colors">
+          ログイン
+        </button>
+        <button type="button" id="password-cancel" class="px-4 py-2.5 rounded-lg bg-surface text-text-muted text-sm font-medium hover:bg-surface-light hover:text-text transition-colors border border-border">
+          キャンセル
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Dashboard panel -->
+<div
+  id="dashboard-panel"
+  class="fixed inset-y-0 right-0 z-50 w-full max-w-md transform translate-x-full transition-transform duration-300 ease-in-out"
+>
+  <!-- Overlay -->
+  <div id="dashboard-overlay" class="fixed inset-0 bg-black/50 opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+
+  <!-- Panel content -->
+  <div class="absolute right-0 inset-y-0 w-full max-w-md bg-white border-l border-border overflow-y-auto">
+    <div class="p-6">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-lg font-bold text-text">表示管理ダッシュボード</h2>
+        <button id="dashboard-close" class="text-text-muted hover:text-text transition-colors">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Bulk actions -->
+      <div class="flex gap-2 mb-4">
+        <button id="select-all" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-muted hover:text-text hover:bg-surface-light transition-colors border border-border">
+          すべて表示
+        </button>
+        <button id="deselect-all" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-muted hover:text-text hover:bg-surface-light transition-colors border border-border">
+          すべて非表示
+        </button>
+        <button id="own-only" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-muted hover:text-text hover:bg-surface-light transition-colors border border-border">
+          自社のみ
+        </button>
+        <button id="client-only" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-surface text-text-muted hover:text-text hover:bg-surface-light transition-colors border border-border">
+          クライアントのみ
+        </button>
+      </div>
+
+      <!-- Counter -->
+      <div class="text-xs text-text-muted mb-4">
+        <span id="visible-count">{allProducts.length}</span> / {allProducts.length} 表示中
+      </div>
+
+      <!-- Product list with checkboxes -->
+      <div class="space-y-1">
+        <!-- Own products section -->
+        <div class="text-xs font-semibold text-accent-light uppercase tracking-wider py-2 border-b border-border">
+          自社プロダクト
+        </div>
+        {allProducts.filter(p => !p.client).map((product) => (
+          <label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface transition-colors cursor-pointer group">
+            <input
+              type="checkbox"
+              class="product-toggle w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent focus:ring-offset-0 focus:ring-1 accent-[var(--color-accent)]"
+              data-product-id={product.id}
+              checked
+            />
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-text group-hover:text-accent transition-colors truncate">
+                {product.name}
+              </div>
+              <div class="text-[11px] text-text-muted truncate">{product.tagline}</div>
+            </div>
+            <span class={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${product.statusColor}`}>
+              {product.status}
+            </span>
+          </label>
+        ))}
+
+        <!-- Client projects section -->
+        <div class="text-xs font-semibold text-accent-light uppercase tracking-wider py-2 mt-4 border-b border-border">
+          クライアント案件
+        </div>
+        {allProducts.filter(p => p.client).map((product) => (
+          <label class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface transition-colors cursor-pointer group">
+            <input
+              type="checkbox"
+              class="product-toggle w-4 h-4 rounded border-border bg-surface text-accent focus:ring-accent focus:ring-offset-0 focus:ring-1 accent-[var(--color-accent)]"
+              data-product-id={product.id}
+              checked
+            />
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-medium text-text group-hover:text-accent transition-colors truncate">
+                {product.name}
+              </div>
+              <div class="text-[11px] text-text-muted truncate">{product.client} — {product.tagline}</div>
+            </div>
+            <span class={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium text-white ${product.statusColor}`}>
+              {product.status}
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Password config ---
+  // SHA-256 hash of the admin password (default: "37design")
+  // To change: run in browser console: crypto.subtle.digest('SHA-256', new TextEncoder().encode('YOUR_PASSWORD')).then(b => console.log([...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('')))
+  const ADMIN_HASH = '2b7676948cd3f78e524bc463e71393a9e7cdbe62c1735603ae5cbdb9df4bcbf9';
+
+  const panel = document.getElementById('dashboard-panel')!;
+  const overlay = document.getElementById('dashboard-overlay')!;
+  const toggleBtn = document.getElementById('dashboard-toggle')!;
+  const closeBtn = document.getElementById('dashboard-close')!;
+  const checkboxes = document.querySelectorAll<HTMLInputElement>('.product-toggle');
+  const cards = document.querySelectorAll<HTMLElement>('#product-grid article');
+  const visibleCount = document.getElementById('visible-count')!;
+  const passwordModal = document.getElementById('password-modal')!;
+  const passwordForm = document.getElementById('password-form')!;
+  const passwordInput = document.getElementById('admin-password') as HTMLInputElement;
+  const passwordError = document.getElementById('password-error')!;
+  const passwordCancel = document.getElementById('password-cancel')!;
+
+  let isAuthenticated = false;
+
+  // Check if already authenticated in this session
+  if (sessionStorage.getItem('admin-auth') === 'true') {
+    isAuthenticated = true;
+    toggleBtn.classList.remove('hidden');
+  }
+
+  async function hashPassword(password: string): Promise<string> {
+    const data = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(hashBuffer)].map(x => x.toString(16).padStart(2, '0')).join('');
+  }
+
+  function showPasswordModal() {
+    passwordModal.classList.remove('hidden');
+    passwordModal.classList.add('flex');
+    passwordInput.value = '';
+    passwordError.classList.add('hidden');
+    setTimeout(() => passwordInput.focus(), 100);
+  }
+
+  function hidePasswordModal() {
+    passwordModal.classList.add('hidden');
+    passwordModal.classList.remove('flex');
+  }
+
+  // Keyboard shortcut: Ctrl+Shift+D to open admin
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      e.preventDefault();
+      if (isAuthenticated) {
+        openPanel();
+      } else {
+        showPasswordModal();
+      }
+    }
+  });
+
+  // Also allow triple-click on footer to trigger (mobile friendly)
+  let footerClickCount = 0;
+  let footerClickTimer: ReturnType<typeof setTimeout>;
+  const footer = document.querySelector('footer');
+  if (footer) {
+    footer.addEventListener('click', () => {
+      footerClickCount++;
+      clearTimeout(footerClickTimer);
+      if (footerClickCount >= 5) {
+        footerClickCount = 0;
+        if (isAuthenticated) {
+          openPanel();
+        } else {
+          showPasswordModal();
+        }
+      }
+      footerClickTimer = setTimeout(() => { footerClickCount = 0; }, 1000);
+    });
+  }
+
+  // Password form submit
+  passwordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const hash = await hashPassword(passwordInput.value);
+    if (hash === ADMIN_HASH) {
+      isAuthenticated = true;
+      sessionStorage.setItem('admin-auth', 'true');
+      toggleBtn.classList.remove('hidden');
+      hidePasswordModal();
+      openPanel();
+    } else {
+      passwordError.classList.remove('hidden');
+      passwordInput.value = '';
+      passwordInput.focus();
+    }
+  });
+
+  passwordCancel.addEventListener('click', hidePasswordModal);
+  passwordModal.addEventListener('click', (e) => {
+    if (e.target === passwordModal) hidePasswordModal();
+  });
+
+  // --- Dashboard panel ---
+  function openPanel() {
+    panel.classList.remove('translate-x-full');
+    overlay.classList.remove('opacity-0', 'pointer-events-none');
+    overlay.classList.add('opacity-100', 'pointer-events-auto');
+  }
+
+  function closePanel() {
+    panel.classList.add('translate-x-full');
+    overlay.classList.add('opacity-0', 'pointer-events-none');
+    overlay.classList.remove('opacity-100', 'pointer-events-auto');
+  }
+
+  function updateVisibility() {
+    const hiddenIds = new Set<string>();
+    checkboxes.forEach(cb => {
+      if (!cb.checked) hiddenIds.add(cb.dataset.productId!);
+    });
+
+    cards.forEach(card => {
+      const id = card.dataset.id!;
+      card.style.display = hiddenIds.has(id) ? 'none' : '';
+    });
+
+    visibleCount.textContent = String(checkboxes.length - hiddenIds.size);
+    localStorage.setItem('hidden-products', JSON.stringify([...hiddenIds]));
+  }
+
+  // Restore from localStorage
+  const saved = localStorage.getItem('hidden-products');
+  if (saved) {
+    const hiddenIds = new Set(JSON.parse(saved) as string[]);
+    checkboxes.forEach(cb => {
+      if (hiddenIds.has(cb.dataset.productId!)) cb.checked = false;
+    });
+    updateVisibility();
+  }
+
+  toggleBtn.addEventListener('click', openPanel);
+  closeBtn.addEventListener('click', closePanel);
+  overlay.addEventListener('click', closePanel);
+
+  checkboxes.forEach(cb => cb.addEventListener('change', updateVisibility));
+
+  document.getElementById('select-all')!.addEventListener('click', () => {
+    checkboxes.forEach(cb => { cb.checked = true; });
+    updateVisibility();
+  });
+
+  document.getElementById('deselect-all')!.addEventListener('click', () => {
+    checkboxes.forEach(cb => { cb.checked = false; });
+    updateVisibility();
+  });
+
+  document.getElementById('own-only')!.addEventListener('click', () => {
+    checkboxes.forEach(cb => {
+      const card = document.querySelector<HTMLElement>(`[data-id="${cb.dataset.productId}"]`);
+      const cat = card?.dataset.category || '';
+      cb.checked = cat.startsWith('product');
+    });
+    updateVisibility();
+  });
+
+  document.getElementById('client-only')!.addEventListener('click', () => {
+    checkboxes.forEach(cb => {
+      const card = document.querySelector<HTMLElement>(`[data-id="${cb.dataset.productId}"]`);
+      const cat = card?.dataset.category || '';
+      cb.checked = cat.startsWith('client');
+    });
+    updateVisibility();
+  });
+</script>

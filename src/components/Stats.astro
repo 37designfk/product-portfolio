@@ -1,20 +1,29 @@
 ---
+import { products } from '../data/products';
+
+const total = products.length;
+const ownProducts = products.filter(p => !p.client).length;
+const clientProjects = products.filter(p => p.client).length;
+const aiPowered = products.filter(p => p.tech.some(t => t.toLowerCase().includes('ai') || t.toLowerCase().includes('claude') || t.toLowerCase().includes('openai') || t.toLowerCase().includes('whisper') || t.toLowerCase().includes('llm'))).length;
+const active = products.filter(p => p.status === '稼働中' || p.status === '管理中').length;
+
 const stats = [
-  { label: 'AI搭載プロダクト', value: '8', suffix: '個' },
-  { label: '稼働中サービス', value: '5', suffix: '本' },
-  { label: '使用技術スタック', value: '15', suffix: '+' },
-  { label: 'モバイルアプリ', value: '1', suffix: '本' },
+  { label: '全プロジェクト', value: String(total), suffix: '' },
+  { label: '自社プロダクト', value: String(ownProducts), suffix: '個' },
+  { label: 'クライアント案件', value: String(clientProjects), suffix: '件' },
+  { label: 'AI搭載', value: String(aiPowered), suffix: '個' },
+  { label: '稼働中', value: String(active), suffix: '本' },
 ];
 ---
 
-<section id="stats" class="py-20 px-4 sm:px-6 lg:px-8 border-t border-white/5">
+<section id="stats" class="py-20 px-4 sm:px-6 lg:px-8 border-t border-border">
   <div class="max-w-5xl mx-auto">
-    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12">開発実績</h2>
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-12 text-text">開発実績</h2>
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
       {stats.map((stat) => (
-        <div class="text-center p-6 rounded-2xl bg-surface border border-white/5">
-          <div class="text-3xl sm:text-4xl font-black text-white mb-1">
-            {stat.value}<span class="text-accent-light text-lg">{stat.suffix}</span>
+        <div class="text-center p-6 rounded-2xl bg-surface border border-border">
+          <div class="text-3xl sm:text-4xl font-black text-text mb-1">
+            {stat.value}<span class="text-accent text-lg">{stat.suffix}</span>
           </div>
           <div class="text-sm text-text-muted">{stat.label}</div>
         </div>
